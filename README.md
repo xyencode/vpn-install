@@ -11,8 +11,10 @@ Simple PPTP, L2TP/IPsec, OpenVPN installers for fast, user-friendly deployment.
 * Backup and uninstallion support
 * Users control (add, check, delete) scripts, autorestarting, iptables automation.
 
-* **NEW: Block IP range from countries with GeoIP and iptables**
-* **NEW: Added script for select current system dns resolver, useful for prevent DNS leaks with geoblocked contents**
+## TODO
+* **NEW: (done) Added script for select current system dns resolver, useful for prevent DNS leaks with geoblocked contents**
+* NEW: (in working) Block IP range from countries with GeoIP and iptables
+* NEW: (in working) Ability to choose OpenVPN custom PROTO and PORT to listening to
 
 + TODO: scripted portforwarding to the clients
 + TODO: mirroring here the geoip cvs database stuff from mailfud.org because of the bandwidth limits in downloads
