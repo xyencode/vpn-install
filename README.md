@@ -19,7 +19,8 @@ Simple PPTP, L2TP/IPsec, OpenVPN installers for fast, user-friendly deployment.
 + TODO: scripted portforwarding to the clients
 + TODO: mirroring here the geoip csv database stuff from mailfud.org because of the bandwidth limits in downloads
 + TODO: (or not todo) tuning iptables default policy to DROP by default.
-+ TODO: Adjust configuration files for pptp server and l2tp server for Windows XP clients
++ TODO: Adjust configuration files for pptp server and l2tp server for native Windows XP client
++ TODO: Check compatibility of PPTP and L2TP on various network equipments with built-in support (tplink, mikrotik, ...)
 
 ## Requirements
 * Ubuntu (tested on Ubuntu 18.04)
