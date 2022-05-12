@@ -20,7 +20,7 @@ eval $PCKTMANAGER update
 if [ "$PLATFORM" == "$CENTOSPLATFORM" ]; then
 	eval $INSTALLER epel-release
 fi
-eval $INSTALLER openvpn easy-rsa $CRON_PACKAGE $IPTABLES_PACKAGE procps net-tools
+eval $INSTALLER openvpn $CRON_PACKAGE $IPTABLES_PACKAGE procps net-tools
 
 echo
 echo "Configuring routing..."
@@ -45,9 +45,16 @@ $DIR/dns.sh
 
 echo
 echo "Creating server keys..."
+
+# Get easy-rsa 2.2.2
+	easy_rsa_url='https://github.com/OpenVPN/easy-rsa/releases/download/2.2.2/EasyRSA-2.2.2.tgz'
+	mkdir -p /etc/openvpn/server/easy-rsa/
+	{ wget -qO- "$easy_rsa_url" 2>/dev/null || curl -sL "$easy_rsa_url" ; } | tar xz -C /etc/openvpn/server/easy-rsa/ --strip-components 1
+	chown -R root:root /etc/openvpn/server/easy-rsa/
+
 if [ "$PLATFORM" == "$CENTOSPLATFORM" ]; then
 	mkdir -p "$CADIR/keys"
-	cp -rf /usr/share/easy-rsa/2.0/* $CADIR
+	cp -rf /etc/openvpn/server/easy-rsa/* $CADIR
 fi
 if [ "$PLATFORM" == "$DEBIANPLATFORM" ]; then
 	make-cadir $CADIR
@@ -86,4 +93,3 @@ systemctl restart openvpn@openvpn-server
 
 echo
 echo "Installation script has been completed!"
-
