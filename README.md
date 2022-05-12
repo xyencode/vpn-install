@@ -1,5 +1,8 @@
 # vpn-install
 Simple PPTP, L2TP/IPsec, OpenVPN installers for fast, user-friendly deployment.
++ Small bugfixes
++ GeoIP-legacy updated database is maintained by mailfud.org
++ Fixed and replaced Easy-RSA with lastest old version 2.2.2 that has vars and scripts.
 
 ## Features
 * PPTP, OpenVPN, IPsec VPN support
@@ -8,13 +11,19 @@ Simple PPTP, L2TP/IPsec, OpenVPN installers for fast, user-friendly deployment.
 * Backup and uninstallion support
 * Users control (add, check, delete) scripts, autorestarting, iptables automation.
 
+* **NEW: Block IP range from countries with GeoIP and iptables**
+
++ TODO: scripted portforwarding to the clients
++ TODO: mirroring here the geoip cvs database stuff from mailfud.org because of the bandwidth limits in downloads
++ TODO: (or not todo) tuning iptables default policy to DROP by default.
++ TODO: Adjust configuration files for pptp server and l2tp server for Windows XP clients
+
 ## Requirements
-* Ubuntu (tested on Ubuntu 16.04, Ubuntu 17.04)
-* Debian (tested on Debian 9)
-* CentOS (tested on CentOS 7)
+* Ubuntu (tested on Ubuntu 18.04)
+* CentOS (in testing... on CentOS 7.9)
 
 ## Installation
-Download: `git clone --depth=1 https://github.com/bedefaced/vpn-install.git`
+Download: `git clone --depth=1 https://github.com/xyencode/vpn-install.git`
 
 And then some of (under *root* or using *sudo*):
 * `vpn-install/pptp/install.sh`
@@ -27,6 +36,9 @@ You will be answered for login-passwords of VPN users, some network information,
 
 
 ## PPTP
+
+**NOTE for Ubuntu branch: Ubuntu 18.04 is the last version supporting PPTP\L2TP because kernel module nf_conntrack_proto_gre is no longer available in upper releases**
+
 Only MS-CHAP v2 with MPPE-128 encryption is allowed. 
 
 Note that PPTP is **NOT** recommended for transmission secret data, because all strong PPTP authentication algorithms have been already hacked: see [link](https://isc.sans.edu/forums/diary/End+of+Days+for+MSCHAPv2/13807/) for more information.
@@ -62,6 +74,9 @@ Create new VPN-connection using standart 'Set up a new connection or network' wi
 
 
 ## IPsec
+
+**NOTE for Ubuntu branch: Ubuntu 18.04 is the last version supporting PPTP\L2TP because kernel module nf_conntrack_proto_gre is no longer available in upper releases**
+
 IPsec over L2TP VPN server with pre-shared key. 
 
 Only MS-CHAP v2 is allowed on L2TP. 
@@ -111,6 +126,7 @@ In the 'Security' tab of created connection check only MS-CHAP v2 protocol, then
 
 
 ## OpenVPN
+
 Server and client certificates and TLS auth are used for authentication (generating using Easy-RSA package, see [adduser.sh](https://github.com/bedefaced/vpn-install/blob/master/openvpn/adduser.sh) and [install.sh](https://github.com/bedefaced/vpn-install/blob/master/openvpn/install.sh)).
 
 Used cipher: AES-256-CBC (see [openvpn-server.conf.dist](https://github.com/bedefaced/vpn-install/blob/master/openvpn/openvpn-server.conf.dist)).
