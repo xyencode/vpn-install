@@ -17,7 +17,7 @@ Simple PPTP, L2TP/IPsec, OpenVPN installers for fast, user-friendly deployment.
 * NEW: (in working) Ability to choose OpenVPN custom PROTO and PORT to listening to
 
 + TODO: scripted portforwarding to the clients
-+ TODO: mirroring here the geoip cvs database stuff from mailfud.org because of the bandwidth limits in downloads
++ TODO: mirroring here the geoip csv database stuff from mailfud.org because of the bandwidth limits in downloads
 + TODO: (or not todo) tuning iptables default policy to DROP by default.
 + TODO: Adjust configuration files for pptp server and l2tp server for Windows XP clients
 
