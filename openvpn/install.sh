@@ -3,6 +3,12 @@
 STARTDIR=$(pwd)
 
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+
+# CUSTOMIZATION 0
+	sed -i -e 's/OVPNPROTOCOL.*/OVPNPROTOCOL=udp/' $DIR/env.sh
+	sed -i -e 's/OVPNPORT.*/OVPNPORT=1194/' $DIR/env.sh
+#
+
 source $DIR/env.sh
 
 if [[ "$EUID" -ne 0 ]]; then
@@ -16,11 +22,11 @@ $DIR/backup.sh
 
 echo
 echo "Installing OpenVPN..."
-eval $PCKTMANAGER update
+eval $PCKTMANAGER -y update
 if [ "$PLATFORM" == "$CENTOSPLATFORM" ]; then
 	eval $INSTALLER epel-release
 fi
-eval $INSTALLER openvpn $CRON_PACKAGE $IPTABLES_PACKAGE procps net-tools
+eval $INSTALLER openvpn $CRON_PACKAGE $IPTABLES_PACKAGE procps net-tools policycoreutils-python
 
 echo
 echo "Configuring routing..."
@@ -34,6 +40,10 @@ sed -i -e "s@OPENVPNDIR@$OPENVPNDIR@g" $OPENVPNCONFIG
 sed -i -e "s@CADIR@$CADIR@g" $OPENVPNCONFIG
 sed -i -e "s@LOCALPREFIX@$LOCALPREFIX@g" $OPENVPNCONFIG
 sed -i -e "s@NOBODYGROUP@$NOBODYGROUP@g" $OPENVPNCONFIG
+
+# CUSTOMIZATION 1
+	$DIR/customize.sh
+#
 
 echo
 echo "Configuring iptables firewall..."
