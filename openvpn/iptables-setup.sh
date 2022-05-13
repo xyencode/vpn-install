@@ -153,9 +153,9 @@ eval iptables -A OUTPUT -o tun+ -j ACCEPT $COMMENT
             echo "These countries will be rejected: ${CC[0]}"
 			;;
 		esac
-        # Permit all outgoing vpn traffic (useless if the OUTPUT policy is already ALLOW)
-        eval iptables -A OUTPUT -p $OVPNPROTOCOL -m $OVPNPROTOCOL --sport $OVPNPORT -j ACCEPT $COMMENT
     fi
+    # Permit all outgoing vpn traffic (useless if the OUTPUT policy is already ALLOW)
+    eval iptables -A OUTPUT -p $OVPNPROTOCOL -m $OVPNPROTOCOL --sport $OVPNPORT -j ACCEPT $COMMENT
 #
 
 # remove standard REJECT rules
