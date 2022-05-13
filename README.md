@@ -11,20 +11,20 @@ Simple PPTP, L2TP/IPsec, OpenVPN installers for fast, user-friendly deployment.
 * Backup and uninstallion support
 * Users control (add, check, delete) scripts, autorestarting, iptables automation.
 
+* **Ability to choose OpenVPN custom PROTOCOL and PORT**
+
 ## TODO
 * **NEW: (done for openvpn) Added script for select current system dns resolver, useful for prevent DNS leaks with geoblocked contents**
-* NEW: (in working) Block IP range from countries with GeoIP and iptables
-* NEW: (in working) Ability to choose OpenVPN custom PROTO and PORT to listening to
+* **NEW: (done for openvpn) Block IP range from countries with GeoIP and iptables**
 
 + TODO: scripted portforwarding to the clients
-+ TODO: mirroring here the geoip csv database stuff from mailfud.org because of the bandwidth limits in downloads
 + TODO: (or not todo) tuning iptables default policy to DROP by default.
 + TODO: Adjust configuration files for pptp server and l2tp server for native Windows XP client
 + TODO: Check compatibility of PPTP and L2TP on various network equipments with built-in support (tplink, mikrotik, ...)
 
 ## Requirements
-* Ubuntu (tested on Ubuntu 18.04)
-* CentOS (in testing... on CentOS 7.9)
+* Ubuntu (in testing..... on Ubuntu 18.04)
+* CentOS (TESTED on CentOS 7.9 with lastest updates)
 
 ## Installation
 Download: `git clone --depth=1 https://github.com/xyencode/vpn-install.git`
@@ -33,6 +33,20 @@ And then some of (under *root* or using *sudo*):
 * `vpn-install/pptp/install.sh`
 * `vpn-install/openvpn/install.sh`
 * `vpn-install/ipsec/install.sh`
+
+## GEOIP FILTERING
+For GEOIP filtering remember to edit, according to your preferences, *cc.allow* and *cc.deny* files in each folder
+Please choose the operating mode between SELECTIVE (1) or EXCLUSIVE (2)
+
+       In SELECTIVE mode clients are allowed to connect only from specific countries.
+       All other countries will be dropped.
+       You MUST specify a list of country codes to allow inside **** cc.allow **** file
+
+       In EXCLUSIVE mode clients are rejected if try to connect from a specific countries,
+       but all other countries are accepted.
+       You MUST specify a list of country codes to block inside **** cc.deny **** file
+
+       Format for cc.allow or cc.deny files is coma-separated i.e. US,CA,FR,DE,IT
 
 These "wizards" will install required packages, generate necessary config files, update network configurations (to enable routing), add iptables rules, add cron jobs (for restarting servers, restoring iptables rules after reboot).
 
