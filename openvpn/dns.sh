@@ -65,9 +65,11 @@ DEFAULTDNS2=$DNS2
 
 sed -i -e "/dhcp-option DNS/d" $OPENVPNCONFIG
 
-
-# Prevent DNS leaks
-echo "push \"ignore-unknown-option block-outside-dns\"" >> $OPENVPNCONFIG
+## Prevent DNS leaks (-- MAYBE IT NEEDS FINETUNING FOR WIN10\WIN11 --)
+#Client (server side not needed)
+echo "ignore-unknown-option block-outside-dns" >> $DIR/openvpn-server.ovpn.dist
+echo "ignore-unknown-option block-outside-dns" >> $DIR/openvpn-server-embedded.ovpn.dist
+#
 
 echo "push \"dhcp-option DNS $DNS1\"" >> $OPENVPNCONFIG
 echo "push \"dhcp-option DNS $DNS2\"" >> $OPENVPNCONFIG
