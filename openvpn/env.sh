@@ -46,3 +46,8 @@ IP=$(ip addr | grep 'inet' | grep -v inet6 | grep -vE '127\.[0-9]{1,3}\.[0-9]{1,
 if [[ "$IP" = "" ]]; then
 	IP=$(wget -4qO- "http://whatismyip.akamai.com/")
 fi
+
+# CUSTOMIZATION 0
+OVPNPROTOCOL=""
+OVPNPORT=""
+#
