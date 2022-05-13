@@ -1,3 +1,5 @@
+...BETA...to be completed
+
 # vpn-install
 Simple PPTP, L2TP/IPsec, OpenVPN installers for fast, user-friendly deployment.
 + Small bugfixes
