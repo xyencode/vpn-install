@@ -90,8 +90,73 @@ eval iptables -A INPUT -i tun+ -j ACCEPT $COMMENT
 eval iptables -A OUTPUT -o tun+ -j ACCEPT $COMMENT
 
 # OpenVPN
-eval iptables -A INPUT -p udp -m udp --dport 1194 -j ACCEPT $COMMENT
-eval iptables -A OUTPUT -p udp -m udp --sport 1194 -j ACCEPT $COMMENT
+#eval iptables -A INPUT -p udp -m udp --dport 1194 -j ACCEPT $COMMENT
+#eval iptables -A OUTPUT -p udp -m udp --sport 1194 -j ACCEPT $COMMENT
+
+# CUSTOMIZATION 2
+#
+# I want to be able to choose whether or not to enable geoip blocking.
+# If YES I must be able to choose the filtering logic: selective or exclusive.
+# EXCLUSIVE it means accepting all nations except those on a list.
+# SELECTIVE it means dropping all nations and accept only those on a list
+# The cc.deny\allow files must contain the country-code list of the countries separated by a comma
+# These iptables rules must be inserted above all others in the INPUT chain
+
+    echo "GEOIP: Remember to modify cc.allow or cc.deny files (coma-separated) according to your needs!"
+    echo
+    GEOIP="no"
+    read -p "GEOIP: Would you want to restrict access for OpenVPN by geographical locations? [no] " ANSGEOIP
+    : ${ANSGEOIP:=$GEOIP}
+
+    if [ "$GEOIP" == "$ANSGEOIP" ]; then
+        # do nothing
+        echo "You choose to accept OpenVPN connections from all over the world"
+        eval iptables -A INPUT -p $OVPNPROTOCOL -m $OVPNPROTOCOL --dport $OVPNPORT -j ACCEPT $COMMENT
+    else
+        # do something
+        $DIR/geoip.sh
+        echo
+        echo "ATTENTION: Ok, GeoIP restrictions will be applied to OpenVPN !!!"
+        echo "Make sure you don't cut yourself off."
+        echo "Complete the following survey..."
+        echo
+        echo
+        echo "GEOIP: Please choose the operating mode between SELECTIVE (1) or EXCLUSIVE (2)"
+        echo "       In SELECTIVE mode clients are allowed to connect only from specific countries."
+        echo "       All other countries will be dropped."
+        echo "       You MUST specify a list of country codes to allow inside **** cc.allow **** file"
+        echo
+        echo "       In EXCLUSIVE mode clients are rejected if try to connect from a specific countries,"
+        echo "       but all other countries are accepted."
+        echo "       You MUST specify a list of country codes to block inside **** cc.deny **** file"
+        echo
+        echo "       Format for cc.allow or cc.deny files is coma-separated i.e. US,CA,FR,DE,IT"
+        echo
+        echo
+        echo
+        read -p "GEOIP: Operating mode? [1]: " ANSMODE
+        until [[ -z "$ANSMODE" || "$ANSMODE" =~ ^[12]$ ]]; do
+			echo "$ANSMODE: invalid selection."
+			read -p "GEOIP: Operating mode? [1]: " ANSMODE
+		done
+        case "$ANSMODE" in
+			1|"") 
+			#do selective
+            readarray -t CC <$DIR/cc.allow
+            eval iptables -I INPUT -p $OVPNPROTOCOL --dport $OVPNPORT -m geoip ! --src-cc ${CC[0]} -j DROP $COMMENT
+            echo "Only these countries are allowed to connect: ${CC[0]}"
+			;;
+			2) 
+			#do exclusive
+            readarray -t CC <$DIR/cc.deny
+            eval iptables -I INPUT -p $OVPNPROTOCOL --dport $OVPNPORT -m geoip --src-cc ${CC[0]} -j DROP $COMMENT
+            echo "These countries will be rejected: ${CC[0]}"
+			;;
+		esac
+        # Permit all outgoing vpn traffic (useless if the OUTPUT policy is already ALLOW)
+        eval iptables -A OUTPUT -p $OVPNPROTOCOL -m $OVPNPROTOCOL --sport $OVPNPORT -j ACCEPT $COMMENT
+    fi
+#
 
 # remove standard REJECT rules
 echo "Note: standard REJECT rules for INPUT and FORWARD will be removed."
