@@ -29,7 +29,8 @@ test -w $DBDIR && cd $DBDIR 2>/dev/null || { echo "Invalid directory: $DBDIR"; e
 # For CENTOS 7.x with lastest updates
 if [ "$PLATFORM" == "$CENTOSPLATFORM" ]; then
 	# Source material from inai.de/files/xtables-addons/
-	wget https://github.com/xyencode/vpn-install/raw/master/xtables-addons-2.15.tar.xz -O $DBDIR/xtables-addons-2.15.tar.xz
+	cp $DIR/../xtables-addons-2.15.tar.xz $DBDIR/xtables-addons-2.15.tar.xz
+	#wget https://github.com/xyencode/vpn-install/raw/master/xtables-addons-2.15.tar.xz -O $DBDIR/xtables-addons-2.15.tar.xz
 	tar xf $DBDIR/xtables-addons-2.15.tar.xz -C $DBDIR && rm $DBDIR/xtables-addons-2.15.tar.xz
 	cd $DBDIR/xtables-addons-2.15
 
@@ -49,7 +50,8 @@ if [ "$PLATFORM" == "$CENTOSPLATFORM" ]; then
 
 
 	# Source material from mailfud.org/geoip-legacy/
-	wget -T 30 https://github.com/xyencode/vpn-install/raw/master/GeoIP-legacy.csv.gz -O GeoIP-legacy.csv.gz
+	cp $DIR/../GeoIP-legacy.csv.gz $DBDIR
+	#wget -T 30 https://github.com/xyencode/vpn-install/raw/master/GeoIP-legacy.csv.gz -O GeoIP-legacy.csv.gz
 	RET=$?
 	if [ $RET -ne 0 ]; then
 		echo "wget GeoIP-legacy.csv.gz failed: $RET" >&2
