@@ -7,6 +7,17 @@ if [ "$PLATFORM" == "$CENTOSPLATFORM" ]; then
 	systemctl enable iptables
 	systemctl stop firewalld
 	systemctl disable firewalld
+
+    # Default iptables rules are injected from this file each time iptables is restarted
+    # Because this action can break our firewall rules, must be removed. Empty file is created.
+    # Maybe you can use these features for our purposes, for more information read:
+    # https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/security_guide/sec-setting_and_controlling_ip_sets_using_iptables
+    if [[ ! -e /etc/sysconfig/iptables.backup ]]; then
+	    mv /etc/sysconfig/iptables /etc/sysconfig/iptables.backup
+        touch /etc/sysconfig/iptables
+    fi
+    #
+    
 	systemctl start iptables
 fi
 
