@@ -18,7 +18,7 @@ fi
 # For CENTOS 7.x with lastest updates
 if [ "$PLATFORM" == "$CENTOSPLATFORM" ]; then
 	#eval $INSTALLER install gcc-c++ make automake kernel-devel-`uname -r` wget iptables-devel perl-Text-CSV_XS
-	eval $INSTALLER install gcc-c++ make automake kernel-devel wget iptables-devel perl-Text-CSV_XS
+	eval $INSTALLER install gcc-c++ make automake kernel-devel-3.10.0-1160.el7 wget iptables-devel perl-Text-CSV_XS
 fi
 
 # DB directory
@@ -52,13 +52,13 @@ if [ "$PLATFORM" == "$CENTOSPLATFORM" ]; then
 	# Source material from mailfud.org/geoip-legacy/
 	cp $DIR/../GeoIP-legacy.csv.gz $DBDIR
 	#wget -T 30 https://github.com/xyencode/vpn-install/raw/master/GeoIP-legacy.csv.gz -O GeoIP-legacy.csv.gz
-	RET=$?
-	if [ $RET -ne 0 ]; then
-		echo "wget GeoIP-legacy.csv.gz failed: $RET" >&2
-		
-		# Continue because the archive may be previously or manually downloaded
-		continue
-	fi
+	#RET=$?
+	# if [ $RET -ne 0 ]; then
+	# 	echo "wget GeoIP-legacy.csv.gz failed: $RET" >&2
+	#
+	# 	# Continue because the archive may be previously or manually downloaded
+	# 	continue
+	# fi
 	
 	# Unpack (original .gz will be deleted with this command, no need to remove it afterward)
 	gzip -d --force GeoIP-legacy.csv.gz
