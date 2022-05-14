@@ -64,21 +64,23 @@ rm $IPTABLES
 
 END
 
-if [ "$(systemctl status ufw; echo $?)" == "0" ]; then
-	echo "systemctl enable ufw" >>$UNINSTALL_SCRIPT
-	echo "systemctl start ufw" >>$UNINSTALL_SCRIPT
-fi
-if [ "$(systemctl status firewalld; echo $?)" == "0" ]; then
-	echo "systemctl enable firewalld" >>$UNINSTALL_SCRIPT
-	echo "systemctl start firewalld" >>$UNINSTALL_SCRIPT
-fi
-if [ "$PLATFORM" == "$CENTOSPLATFORM" ]; then
-	# iptables
-	if [ "$(systemctl status iptables; echo $?)" != "0" ]; then
-		echo "systemctl stop iptables" >>$UNINSTALL_SCRIPT
-		echo "systemctl disable iptables" >>$UNINSTALL_SCRIPT
-	fi
-fi
+# !!! DON'T DO THIS: LEAVE COMMENTED THE FOLLOWING INSTRUCTIONS OTHERWISE IT MESSES UP IPTABLES
+	# if [ "$(systemctl status ufw; echo $?)" == "0" ]; then
+	# 	echo "systemctl enable ufw" >>$UNINSTALL_SCRIPT
+	# 	echo "systemctl start ufw" >>$UNINSTALL_SCRIPT
+	# fi
+	# if [ "$(systemctl status firewalld; echo $?)" == "0" ]; then
+	# 	echo "systemctl enable firewalld" >>$UNINSTALL_SCRIPT
+	# 	echo "systemctl start firewalld" >>$UNINSTALL_SCRIPT
+	# fi
+	# if [ "$PLATFORM" == "$CENTOSPLATFORM" ]; then
+	# 	# iptables
+	# 	if [ "$(systemctl status iptables; echo $?)" != "0" ]; then
+	# 		echo "systemctl stop iptables" >>$UNINSTALL_SCRIPT
+	# 		echo "systemctl disable iptables" >>$UNINSTALL_SCRIPT
+	# 	fi
+	# fi
+#
 
 # remove packages
 UNINST_PACKAGES=
