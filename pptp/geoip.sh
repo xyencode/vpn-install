@@ -17,8 +17,8 @@ fi
 # INSTALL PREREQUISITES
 # For CENTOS 7.x with lastest updates
 if [ "$PLATFORM" == "$CENTOSPLATFORM" ]; then
-	#eval $INSTALLER install gcc-c++ make automake kernel-devel-`uname -r` wget iptables-devel perl-Text-CSV_XS
-	eval $INSTALLER install gcc-c++ make automake kernel-devel-3.10.0-1160.el7 wget iptables-devel perl-Text-CSV_XS
+	eval $INSTALLER install gcc-c++ make automake kernel-devel-`uname -r` wget iptables-devel perl-Text-CSV_XS
+	#eval $INSTALLER install gcc-c++ make automake kernel-devel-3.10.0-1160.el7 wget iptables-devel perl-Text-CSV_XS
 fi
 
 # DB directory
