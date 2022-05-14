@@ -14,7 +14,7 @@ $DIR/backup.sh
 
 echo
 echo "Installing PPTP server..."
-eval $PCKTMANAGER update
+eval $PCKTMANAGER -y update
 if [ "$PLATFORM" == "$CENTOSPLATFORM" ]; then
 	eval $INSTALLER epel-release
 fi
@@ -58,4 +58,3 @@ service pptpd restart
 
 echo
 echo "Installation script has been completed!"
-
