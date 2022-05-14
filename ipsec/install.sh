@@ -14,7 +14,7 @@ $DIR/backup.sh
 
 echo
 echo "Installing strongSwan and xl2tp server..."
-eval $PCKTMANAGER update
+eval $PCKTMANAGER -y update
 if [ "$PLATFORM" == "$CENTOSPLATFORM" ]; then
 	eval $INSTALLER epel-release
 fi
@@ -63,4 +63,3 @@ service strongswan restart
 
 echo
 echo "Installation script has been completed!"
-
