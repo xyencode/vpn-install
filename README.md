@@ -17,12 +17,12 @@ Simple PPTP, L2TP/IPsec, OpenVPN installers for fast, user-friendly deployment.
 * **DNS: Predefined sets. Added system resolvers useful for prevent DNS leaks with geoblocked contents**
 
 ## TODO
-+ TODO: scripted portforwarding to the clients
-+ TODO: Adjust configuration files for pptp server and l2tp server for native Windows XP client
++ TODO: Scripted portforwarding to the clients
++ TODO: Check and adjust configuration files for pptp server and l2tp server for native Windows XP client
 + TODO: Check compatibility of PPTP and L2TP on various network equipments with built-in support (tplink, mikrotik, ...)
 
 ## Requirements
-* Ubuntu (in testing..... on Ubuntu 18.04)
+* Ubuntu (Successfully tested on Ubuntu Server 18.04 LTS with lastest core 4.15.0-177-generic x86_64)
 * CentOS 7 (Successfully tested on CentOS 7.9 with lastest core 3.10.0-1160-62.1.el7.x86_64)
 
 ## Installation
