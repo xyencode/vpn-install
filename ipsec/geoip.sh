@@ -5,9 +5,6 @@ source $DIR/env.sh
 # Database directory (all generated and downloaded stuff will be put here)
 DBDIR=/usr/share/xt_geoip
 
-# Files to download (UNUSED VARIABLE)
-XTABLES="GeoIP-legacy.csv"
-
 # Standard distribution location for xtables script, change if using custom
 # For CENTOS 7.x with lastest updates
 if [ "$PLATFORM" == "$CENTOSPLATFORM" ]; then
@@ -18,8 +15,12 @@ fi
 # For CENTOS 7.x with lastest updates
 if [ "$PLATFORM" == "$CENTOSPLATFORM" ]; then
 	eval $INSTALLER install gcc-c++ make automake kernel-devel-`uname -r` wget iptables-devel perl-Text-CSV_XS
-	#eval $INSTALLER install gcc-c++ make automake kernel-devel-3.10.0-1160.el7 wget iptables-devel perl-Text-CSV_XS
 fi
+# For UBUNTU 18.04 with lastest updates
+if [ "$PLATFORM" == "$DEBIANPLATFORM" ]; then
+	eval $INSTALLER curl unzip perl xtables-addons-common libtext-csv-xs-perl libmoosex-types-netaddr-ip-perl
+fi
+
 
 # DB directory
 mkdir -m 755 $DBDIR 2>/dev/null
@@ -30,7 +31,6 @@ test -w $DBDIR && cd $DBDIR 2>/dev/null || { echo "Invalid directory: $DBDIR"; e
 if [ "$PLATFORM" == "$CENTOSPLATFORM" ]; then
 	# Source material from inai.de/files/xtables-addons/
 	cp $DIR/../xtables-addons-2.15.tar.xz $DBDIR/xtables-addons-2.15.tar.xz
-	#wget https://github.com/xyencode/vpn-install/raw/master/xtables-addons-2.15.tar.xz -O $DBDIR/xtables-addons-2.15.tar.xz
 	tar xf $DBDIR/xtables-addons-2.15.tar.xz -C $DBDIR && rm $DBDIR/xtables-addons-2.15.tar.xz
 	cd $DBDIR/xtables-addons-2.15
 
@@ -48,17 +48,8 @@ if [ "$PLATFORM" == "$CENTOSPLATFORM" ]; then
 	# NOTE: at this point I should be in /usr/share/xt_geoip, just to be sure:
 	cd $DBDIR
 
-
 	# Source material from mailfud.org/geoip-legacy/
 	cp $DIR/../GeoIP-legacy.csv.gz $DBDIR
-	#wget -T 30 https://github.com/xyencode/vpn-install/raw/master/GeoIP-legacy.csv.gz -O GeoIP-legacy.csv.gz
-	#RET=$?
-	#if [ $RET -ne 0 ]; then
-	#	echo "wget GeoIP-legacy.csv.gz failed: $RET" >&2
-	#	
-	#	# Continue because the archive may be previously or manually downloaded
-	#	continue
-	#fi
 	
 	# Unpack (original .gz will be deleted with this command, no need to remove it afterward)
 	gzip -d --force GeoIP-legacy.csv.gz
@@ -89,8 +80,33 @@ if [ "$PLATFORM" == "$CENTOSPLATFORM" ]; then
 	fi
 fi
 
-# For UBUNTU 18.04 with lastest updates
-#··························· >> TODO <<
+# For UBUNTU 18.04 up to kernel 4.x
+if [ "$PLATFORM" == "$DEBIANPLATFORM" ]; then
+	if [ $(uname -r | awk -F . '{print $1}') -le 4  ]; then
+		#Downloading updated database
+		echo "updating xtables GeoIP database"
+		# NOTE: at this point I should be in /usr/share/xt_geoip, just to be sure:
+		cd $DBDIR
+
+		# Source material from mailfud.org/geoip-legacy/
+		cp $DIR/../GeoIP-legacy.csv.gz $DBDIR
+		
+		# Unpack (original .gz will be deleted with this command, no need to remove it afterward)
+		gzip -d --force GeoIP-legacy.csv.gz
+
+		#Building tables
+		chmod +x /usr/lib/xtables-addons/xt_geoip_build
+		/usr/lib/xtables-addons/xt_geoip_build -D /usr/share/xt_geoip/ $DBDIR/GeoIP-legacy.csv
+		rm $DBDIR/GeoIP-legacy.csv
+
+		#Test
+		if modprobe xt_geoip >/dev/null 2>&1; then echo "Module xt_geoip loaded"; else echo "Failed to modprobe xt_geoip"; fi;
+	else
+		echo "The kernel version is too new. Unable to install legacy xtables and geoip. Also PPTP and L2TP do not work on kernels >= 5.x"
+		echo "Revert to a previous kernel 4.x and reinstall this vpn script"
+		exit 0
+	fi
+fi
 
 # Return to the fold
 cd $DIR

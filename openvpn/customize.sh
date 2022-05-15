@@ -56,6 +56,8 @@ source $DIR/env.sh
 	# SELINUX
 	# To be able to run openvpn on custom proto\port, selinux context must be adapted adding these values, default value will be ignored
 	# Utility "semanage" is part of "policycoreutils-python package"
-	eval semanage port -a -t openvpn_port_t -p $VPNPRTCL $VPNPRT
+	if [ "$PLATFORM" == "$CENTOSPLATFORM" ]; then
+		eval semanage port -a -t openvpn_port_t -p $VPNPRTCL $VPNPRT
+	fi
 
 # END CUSTOMIZATION 1

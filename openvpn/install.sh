@@ -26,8 +26,18 @@ eval $PCKTMANAGER -y update
 if [ "$PLATFORM" == "$CENTOSPLATFORM" ]; then
 	eval $INSTALLER epel-release
 fi
-eval $INSTALLER openvpn $CRON_PACKAGE $IPTABLES_PACKAGE procps net-tools policycoreutils-python
 
+eval $INSTALLER openvpn $CRON_PACKAGE $IPTABLES_PACKAGE procps net-tools
+
+# Contains "semanage" to manage SELinux
+if [ "$PLATFORM" == "$CENTOSPLATFORM" ]; then
+	eval $INSTALLER policycoreutils-python
+fi
+
+# For UBUNTU 18.04 easy-rsa is still at 2.x branch, so it's ok
+if [ "$PLATFORM" == "$DEBIANPLATFORM" ]; then
+	eval $INSTALLER easy-rsa
+fi
 echo
 echo "Configuring routing..."
 $DIR/sysctl.sh
@@ -56,18 +66,20 @@ $DIR/dns.sh
 echo
 echo "Creating server keys..."
 
-# Get easy-rsa 2.2.2
+if [ "$PLATFORM" == "$CENTOSPLATFORM" ]; then
+	# Get easy-rsa 2.2.2
 	easy_rsa_url='https://github.com/OpenVPN/easy-rsa/releases/download/2.2.2/EasyRSA-2.2.2.tgz'
 	mkdir -p /etc/openvpn/server/easy-rsa/
 	{ wget -qO- "$easy_rsa_url" 2>/dev/null || curl -sL "$easy_rsa_url" ; } | tar xz -C /etc/openvpn/server/easy-rsa/ --strip-components 1
 	chown -R root:root /etc/openvpn/server/easy-rsa/
 
-if [ "$PLATFORM" == "$CENTOSPLATFORM" ]; then
 	mkdir -p "$CADIR/keys"
 	cp -rf /etc/openvpn/server/easy-rsa/* $CADIR
 fi
 if [ "$PLATFORM" == "$DEBIANPLATFORM" ]; then
 	make-cadir $CADIR
+	#Generate .rnd into home
+	eval openssl rand -writerand ~/.rnd
 fi
 
 # workaround: Debian's openssl version is not compatible with easy-rsa

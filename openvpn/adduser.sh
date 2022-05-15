@@ -29,6 +29,11 @@ do
 
 	if [[ $? -ne 0 ]]; then
 
+		if [ "$PLATFORM" == "$DEBIANPLATFORM" ]; then
+			#Generate .rnd into home
+			eval openssl rand -writerand ~/.rnd
+		fi
+
 		./build-key --batch $LOGIN
 
 		if [ $? -eq 0 ]; then
