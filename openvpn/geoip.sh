@@ -14,7 +14,7 @@ fi
 # INSTALL PREREQUISITES
 # For CENTOS 7.x with lastest updates
 if [ "$PLATFORM" == "$CENTOSPLATFORM" ]; then
-	eval $INSTALLER install gcc-c++ make automake kernel-devel-`uname -r` wget iptables-devel perl-Text-CSV_XS
+	eval $INSTALLER gcc-c++ make automake kernel-devel-`uname -r` wget iptables-devel perl-Text-CSV_XS
 fi
 # For UBUNTU 18.04 with lastest updates
 if [ "$PLATFORM" == "$DEBIANPLATFORM" ]; then
