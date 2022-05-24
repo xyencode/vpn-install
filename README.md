@@ -191,7 +191,9 @@ You can also use Ubuntu standard Network Manager for OpenVPN connection. Just im
 
 **On Windows:**
 
-Download OpenVPV GUI client: [https://openvpn.net/index.php/open-source/downloads.html](https://openvpn.net/index.php/open-source/downloads.html).
+Download OpenVPN GUI client: [https://openvpn.net/index.php/open-source/downloads.html](https://openvpn.net/index.php/open-source/downloads.html).
+
+For Windows XP SP3 download this patched version [https://sourceforge.net/projects/openvpn-for-windows-xp/](https://sourceforge.net/projects/openvpn-for-windows-xp/)
 
 Import config and connect, or run explorer context menu command.
 
