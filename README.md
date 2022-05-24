@@ -1,5 +1,3 @@
-...BETA...to be completed
-
 # vpn-install
 Simple PPTP, L2TP/IPsec, OpenVPN installers for fast, user-friendly deployment.
 + Small bugfixes
@@ -17,13 +15,14 @@ Simple PPTP, L2TP/IPsec, OpenVPN installers for fast, user-friendly deployment.
 * **DNS: Predefined sets. Added system resolvers useful for prevent DNS leaks with geoblocked contents**
 
 ## TODO
-+ TODO: Scripted portforwarding to the clients
++ TODO: Scripted portforwarding to the clients (and static ip assignment)
 + TODO: Check and adjust configuration files for pptp server and l2tp server for native Windows XP client
-+ TODO: Check compatibility of PPTP and L2TP on various network equipments with built-in support (tplink, mikrotik, ...)
++ TODO: Accurate revision of iptables rules restoring on reboot (considering to move to a systemd service to do this)
 
 ## Requirements
 * Ubuntu (Successfully tested on Ubuntu Server 18.04 LTS with lastest core 4.15.0-177-generic x86_64)
 * CentOS 7 (Successfully tested on CentOS 7.9 with lastest core 3.10.0-1160-62.1.el7.x86_64)
+* CentOS Stream 8 (Successfully tested on CentOS Stream 8)
 
 ## Installation
 Download: `git clone --depth=1 https://github.com/xyencode/vpn-install.git`
@@ -34,7 +33,12 @@ And then some of (under *root* or using *sudo*):
 * `vpn-install/ipsec/install.sh`
 
 ## GEOIP FILTERING
-For GEOIP filtering remember to edit, according to your preferences, *cc.allow* and *cc.deny* files in each folder
+
+BEFORE INSTALLATION !!!
+
+For GEOIP filtering remember to edit, according to your preferences,
+*cc.allow* and *cc.deny* files in each folder.
+
 Please choose the operating mode between SELECTIVE (1) or EXCLUSIVE (2)
 
        In SELECTIVE mode clients are allowed to connect only from specific countries.
@@ -71,6 +75,7 @@ By default (see [pptpd.conf.dist](https://github.com/xyencode/vpn-install/blob/m
 * [deluser.sh](https://github.com/xyencode/vpn-install/blob/master/pptp/deluser.sh) - script for user-friendly chap-secrets file existing user removing.
 * [dns.sh](https://github.com/xyencode/vpn-install/blob/master/pptp/dns.sh) - script for user-friendly modifiying of DNS-resolver settings which will be pushed to Windows clients.
 * [env.sh](https://github.com/xyencode/vpn-install/blob/master/pptp/env.sh) - common for all scripts config variables (packet manager, subnet, ip, config files paths).
+* [geoip.sh](https://github.com/xyencode/vpn-install/blob/master/pptp/geoip.sh) - Prepare (and update) system with xtables addons for iptables. This script can be run as standalone for update database or rebuild kernel modules.
 * [install.sh](https://github.com/xyencode/vpn-install/blob/master/pptp/install.sh) - main installation script (wizard).
 * [iptables-setup.sh](https://github.com/xyencode/vpn-install/blob/master/pptp/iptables-setup.sh) - iptables configuration script.
 * [options.pptp.dist](https://github.com/xyencode/vpn-install/blob/master/pptp/options.pptp.dist) - [PPP options](https://ppp.samba.org/pppd.html) template.
@@ -122,6 +127,7 @@ IKE encryption algorithms: see [ipsec.conf.dist](https://github.com/xyencode/vpn
 * [install.sh](https://github.com/xyencode/vpn-install/blob/master/ipsec/install.sh) - main installation script (wizard).
 * [ipsec.conf.dist](https://github.com/xyencode/vpn-install/blob/master/ipsec/ipsec.conf.dist) - [IPsec (strongSwan) config](https://wiki.strongswan.org/projects/strongswan/wiki/ConnSection) file template.
 * [iptables-setup.sh](https://github.com/xyencode/vpn-install/blob/master/ipsec/iptables-setup.sh) - iptables configuration script.
+* [geoip.sh](https://github.com/xyencode/vpn-install/blob/master/ipsec/geoip.sh) - Prepare (and update) system with xtables addons for iptables. This script can be run as standalone for update database or rebuild kernel modules.
 * [options.xl2tpd.dist](https://github.com/xyencode/vpn-install/blob/master/ipsec/options.xl2tpd.dist) - [PPP options](https://ppp.samba.org/pppd.html) template.
 * [psk.sh](https://github.com/xyencode/vpn-install/blob/master/ipsec/psk.sh) - script for user-friendly creating pre-shared key in [ipsec.secrets](https://linux.die.net/man/5/ipsec.secrets) file.
 * [setup.sh.dist](https://github.com/xyencode/vpn-install/blob/master/ipsec/setup.sh.dist) - client-side connection installer script template.
@@ -157,11 +163,13 @@ Port 1194 (default).
 * [backup.sh](https://github.com/xyencode/vpn-install/blob/master/openvpn/backup.sh) - script for backuping system config files, parameters, services and packages statuses and uninstall script generating.
 * [checkserver.sh](https://github.com/xyencode/vpn-install/blob/master/openvpn/checkserver.sh) - script for cron job, which check server running state.
 * [checkuser.sh](https://github.com/xyencode/vpn-install/blob/master/openvpn/checkuser.sh) - script for user-friendly existing user checking.
+* [customize.sh](https://github.com/xyencode/vpn-install/blob/master/openvpn/customize.sh) - script that implements new features: custom protocol and port selection
 * [deluser.sh](https://github.com/xyencode/vpn-install/blob/master/openvpn/deluser.sh) - script for user-friendly existing user removing (certificate revoking).
 * [dns.sh](https://github.com/xyencode/vpn-install/blob/master/openvpn/dns.sh) - script for user-friendly modifiying of DNS-resolver settings which will be pushed to Windows clients.
 * [env.sh](https://github.com/xyencode/vpn-install/blob/master/openvpn/env.sh) - common for all scripts config variables (subnet, ip, config files paths).
 * [install.sh](https://github.com/xyencode/vpn-install/blob/master/openvpn/install.sh) - main installation script (wizard).
 * [iptables-setup.sh](https://github.com/xyencode/vpn-install/blob/master/openvpn/iptables-setup.sh) - iptables configuration script.
+* [geoip.sh](https://github.com/xyencode/vpn-install/blob/master/openvpn/geoip.sh) - Prepare (and update) system with xtables addons for iptables. This script can be run as standalone for update database or rebuild kernel modules.
 * [openvpn-server-embedded.ovpn.dist](https://github.com/xyencode/vpn-install/blob/master/openvpn/openvpn-server-embedded.ovpn.dist) - client config file with embedded keys and certificates template.
 * [openvpn-server.conf.dist](https://github.com/xyencode/vpn-install/blob/master/openvpn/openvpn-server.conf.dist) - OpenVPN server [config file](https://openvpn.net/index.php/open-source/documentation/howto.html) template.
 * [openvpn-server.ovpn.dist](https://github.com/xyencode/vpn-install/blob/master/openvpn/openvpn-server.ovpn.dist) - client config file template.
