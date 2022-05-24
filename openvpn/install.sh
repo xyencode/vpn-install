@@ -31,7 +31,14 @@ eval $INSTALLER openvpn $CRON_PACKAGE $IPTABLES_PACKAGE procps net-tools
 
 # Contains "semanage" to manage SELinux
 if [ "$PLATFORM" == "$CENTOSPLATFORM" ]; then
-	eval $INSTALLER policycoreutils-python
+	
+	if [ $(awk '{print $4}' /etc/centos-release) -ge 8 ]; then
+		#Centos Stream 8,9 (minimal)
+		eval $INSTALLER tar wget policycoreutils-python-utils
+	else
+		#Centos 7
+		eval $INSTALLER policycoreutils-python
+	fi
 fi
 
 # For UBUNTU 18.04 easy-rsa is still at 2.x branch, so it's ok
@@ -110,8 +117,17 @@ $DIR/adduser.sh
 
 echo
 echo "Starting OpenVPN..."
-systemctl -f enable openvpn@openvpn-server
-systemctl restart openvpn@openvpn-server
+if [ "$PLATFORM" == "$CENTOSPLATFORM" ] && [ $(awk '{print $4}' /etc/centos-release) -ge 8 ]; then
+	# It's needed to specify absolute path otherwise --config can't be readed
+	sed -i 's/--config\ %i.conf/--config\ \/etc\/openvpn\/openvpn-server.conf/' /etc/systemd/system/multi-user.target.wants/openvpn-server@server.service
+	
+	systemctl -f enable openvpn-server@server
+	systemctl restart openvpn-server@server
+else
+	systemctl -f enable openvpn@openvpn-server
+	systemctl restart openvpn@openvpn-server
+fi
+
 
 echo
 echo "Installation script has been completed!"

@@ -6,15 +6,19 @@ source $DIR/env.sh
 DBDIR=/usr/share/xt_geoip
 
 # Standard distribution location for xtables script, change if using custom
-# For CENTOS 7.x with lastest updates
+# For CentOS 7, Stream 8 with lastest updates
 if [ "$PLATFORM" == "$CENTOSPLATFORM" ]; then
 	XT_GEOIP_BUILD=/usr/local/libexec/xtables-addons/xt_geoip_build
 fi
 
 # INSTALL PREREQUISITES
-# For CENTOS 7.x with lastest updates
+# For CentOS 7, Stream 8 with lastest updates
 if [ "$PLATFORM" == "$CENTOSPLATFORM" ]; then
-	eval $INSTALLER gcc-c++ make automake kernel-devel-`uname -r` wget iptables-devel perl-Text-CSV_XS
+	eval $INSTALLER gcc-c++ make automake kernel-devel-`uname -r` wget tar iptables-devel perl-Text-CSV_XS
+    if [ $(awk '{print $4}' /etc/centos-release) -ge 8 ]; then
+        # Additional stuff missing in CentOS Stream 8 minimal
+        eval $INSTALLER elfutils-libelf-devel perl-Net-CIDR-Lite
+    fi
 fi
 # For UBUNTU 18.04 with lastest updates
 if [ "$PLATFORM" == "$DEBIANPLATFORM" ]; then
@@ -27,57 +31,92 @@ mkdir -m 755 $DBDIR 2>/dev/null
 test -w $DBDIR && cd $DBDIR 2>/dev/null || { echo "Invalid directory: $DBDIR"; exit 1; }
 
 # Install XTABLES ADDONS
+# Source material from inai.de/files/xtables-addons/
 # For CENTOS 7.x with lastest updates
 if [ "$PLATFORM" == "$CENTOSPLATFORM" ]; then
-	# Source material from inai.de/files/xtables-addons/
-	cp $DIR/../xtables-addons-2.15.tar.xz $DBDIR/xtables-addons-2.15.tar.xz
-	tar xf $DBDIR/xtables-addons-2.15.tar.xz -C $DBDIR && rm $DBDIR/xtables-addons-2.15.tar.xz
-	cd $DBDIR/xtables-addons-2.15
+	if [ $(awk '{print $4}' /etc/centos-release) -ge 8 ]; then
+        #Centos Stream 8 (minimal)
+		
+        cp $DIR/../xtables-addons-3.20.tar.xz $DBDIR/xtables-addons-3.20.tar.xz
+		tar xf $DBDIR/xtables-addons-3.20.tar.xz -C $DBDIR && rm $DBDIR/xtables-addons-3.20.tar.xz
+		cd $DBDIR/xtables-addons-3.20
 
-	# Disable TARPIT module because of compile errors on CentOS (also is not useful for our scope) as discovered here xinet.kr/?p=2132
+        # Disable a lot of modules because of compile errors on CentOS Stream 8 (also is not useful for our scope)
+        sed -i 's/build_TARPIT=m/#build_TARPIT=m/' ./mconfig
+        sed -i 's/build_DELUDE=m/#build_DELUDE=m/' ./mconfig
+        sed -i 's/build_ECHO=m/#build_ECHO=m/' ./mconfig
+        sed -i 's/build_ipp2p=m/#build_ipp2p=m/' ./mconfig
+	else
+        #Centos 7
 
-	sed -i 's/build_TARPIT=m/#build_TARPIT=m/' ./mconfig
+        cp $DIR/../xtables-addons-2.15.tar.xz $DBDIR/xtables-addons-2.15.tar.xz
+        tar xf $DBDIR/xtables-addons-2.15.tar.xz -C $DBDIR && rm $DBDIR/xtables-addons-2.15.tar.xz
+        cd $DBDIR/xtables-addons-2.15
+
+        # Disable TARPIT module because of compile errors on CentOS (also is not useful for our scope) as discovered here xinet.kr/?p=2132
+        sed -i 's/build_TARPIT=m/#build_TARPIT=m/' ./mconfig
+    fi
 
 	# Continue with installation
 	./configure
 	make
 	make install
 
-	rm -rf $DBDIR/xtables-addons-2.15
+	rm -rf $DBDIR/xtables-addons-2.15 $DBDIR/xtables-addons-3.20
 
 	# NOTE: at this point I should be in /usr/share/xt_geoip, just to be sure:
 	cd $DBDIR
 
-	# Source material from mailfud.org/geoip-legacy/
-	cp $DIR/../GeoIP-legacy.csv.gz $DBDIR
-	
-	# Unpack (original .gz will be deleted with this command, no need to remove it afterward)
-	gzip -d --force GeoIP-legacy.csv.gz
+    if [ $(awk '{print $4}' /etc/centos-release) -ge 8 ]; then
+        #Centos Stream 8 (minimal)
+        #XTABLES-ADDONS 3.x branch uses tables provided by db-ip database.
+        wget https://download.db-ip.com/free/dbip-country-lite-$(date +"%Y")-$(date +"%m").csv.gz -O $DBDIR/dbip-country-lite.csv.gz
+        
+        # Unpack (original .gz will be deleted with this command, no need to remove it afterward)
+        gunzip $DBDIR/dbip-country-lite.csv.gz
+        
+        #It seems to be already executable on Centos Stream 8, just to be sure...
+        chmod +x $XT_GEOIP_BUILD
+        
+        # Tables building
+        perl $XT_GEOIP_BUILD -D $DBDIR
 
-	echo "updating xtables GeoIP database"
+        #TODO: add here a simply check to test if build has done right
+        
+        rm $DBDIR/dbip-country-lite.csv
+    else
+        #Centos 7
+        # Source material from mailfud.org/geoip-legacy/
+        cp $DIR/../GeoIP-legacy.csv.gz $DBDIR
+        
+        # Unpack (original .gz will be deleted with this command, no need to remove it afterward)
+        gzip -d --force GeoIP-legacy.csv.gz
 
-	if [ ! -f "$XT_GEOIP_BUILD" ]; then
-		echo "xt_geoip_build not found, xtables addons not installed?" >&2
-		exit 0
-	fi
-	if [ ! -f "GeoIP-legacy.csv" ]; then
-		echo "GeoIP-legacy.csv not found, cannot update xt_geoip" >&2
-		exit 0
-	fi
+        echo "updating xtables GeoIP database"
 
-	# Prepare PERL command
-	XCMD="perl $XT_GEOIP_BUILD -D /usr/share/xt_geoip $DBDIR/GeoIP-legacy.csv"
+        if [ ! -f "$XT_GEOIP_BUILD" ]; then
+            echo "xt_geoip_build not found, xtables addons not installed?" >&2
+            exit 0
+        fi
+        if [ ! -f "GeoIP-legacy.csv" ]; then
+            echo "GeoIP-legacy.csv not found, cannot update xt_geoip" >&2
+            exit 0
+        fi
 
-	# Tables building + simply check
-	RET=$($XCMD 2>/dev/null | tail -1)
-	if [[ "$RET" =~ (Zimbabwe|ZW) ]]; then
-		echo "xt_geoip updated"
-	else
-		echo "something went wrong with xt_geoip update" >&2
-		echo "do you have perl module Text::CSV_XS / libtext-csv-xs-perl installed?" >&2
-		echo "try running command manually:" >&2
-		echo "$XCMD" >&2
-	fi
+        # Prepare PERL command
+        XCMD="perl $XT_GEOIP_BUILD -D /usr/share/xt_geoip $DBDIR/GeoIP-legacy.csv"
+
+        # Tables building + simply check
+        RET=$($XCMD 2>/dev/null | tail -1)
+        if [[ "$RET" =~ (Zimbabwe|ZW) ]]; then
+            echo "xt_geoip updated"
+        else
+            echo "something went wrong with xt_geoip update" >&2
+            echo "do you have perl module Text::CSV_XS / libtext-csv-xs-perl installed?" >&2
+            echo "try running command manually:" >&2
+            echo "$XCMD" >&2
+        fi
+    fi
 fi
 
 # For UBUNTU 18.04 up to kernel 4.x
